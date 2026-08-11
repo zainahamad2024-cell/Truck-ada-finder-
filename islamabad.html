@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Islamabad Capital Territory – Truck Ada Finder.pk</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🚚</span>
+        Truck Ada Finder.pk
+      </a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="index.html#provinces">Provinces</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> › Islamabad Capital Territory
+    </div>
+
+    <h1 class="section-title">Islamabad Capital Territory – Truck Addas</h1>
+    <p style="color:var(--text-muted); margin-bottom:0.5rem;">Search areas below or submit a new truck adda for listing.</p>
+
+    <div class="search-box">
+      <input type="text" id="citySearch" placeholder="Search areas in ICT..." autocomplete="off">
+    </div>
+
+    <div class="cities-list" id="citiesList"></div>
+
+    <div class="adda-section" id="addaSection">
+      <div class="empty-state">
+        <p>Select an area above to view truck addas.</p>
+        <p style="margin-top:0.4rem; font-size:0.9rem;">No addas are pre-listed. Submissions appear after admin approval.</p>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3>Submit a Truck Adda</h3>
+      <p class="form-desc">Fill the form below. Your listing will be reviewed by admin before it appears on the site.</p>
+
+      <form id="addaForm">
+        <div class="form-group">
+          <label for="cityInput">City *</label>
+          <input type="text" id="cityInput" list="cityDatalist" required placeholder="Type city name (e.g. Kot Addu, Taunsa Sharif)" autocomplete="off">
+          <datalist id="cityDatalist"></datalist>
+        </div>
+        <div class="form-group">
+          <label for="addaName">Adda / Stand Name *</label>
+          <input type="text" id="addaName" required placeholder="e.g. Tarnol Truck Stand">
+        </div>
+        <div class="form-group">
+          <label for="addaAddress">Full Address *</label>
+          <textarea id="addaAddress" required placeholder="Street, area, landmark"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="addaPhone">Phone Number *</label>
+          <input type="tel" id="addaPhone" required placeholder="03XX-XXXXXXX">
+        </div>
+        <button type="submit" class="btn">Submit for Approval</button>
+      </form>
+      <div class="success-msg" id="successMsg">
+        ✅ Thank you! Your truck adda has been submitted successfully. It will appear on the site after admin approval.
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Truck Ada Finder.pk</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    const ictAreas = [
+      "Islamabad", "Tarnol", "Golra", "I-9 Industrial Area", "I-10",
+      "Rawat", "Bhara Kahu", "Nilore", "Sihala", "Korang"
+    ];
+    initProvincePage("islamabad", ictAreas);
+  </script>
+</body>
+</html>
