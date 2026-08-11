@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – Truck Ada Finder.pk</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .login-box {
+      max-width: 380px;
+      margin: 4rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .login-box h2 {
+      color: var(--primary);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stats {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      min-width: 120px;
+    }
+    .stat-card .num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .submission-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .submission-card.pending {
+      border-left: 4px solid var(--accent);
+    }
+    .submission-card.approved {
+      border-left: 4px solid #0d9488;
+    }
+    .submission-card.rejected {
+      border-left: 4px solid #dc2626;
+      opacity: 0.75;
+    }
+    .sub-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .sub-meta span {
+      margin-right: 1rem;
+    }
+    .sub-actions {
+      margin-top: 0.9rem;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .btn-sm {
+      padding: 0.45rem 1rem;
+      font-size: 0.9rem;
+    }
+    .btn-approve {
+      background: #0d9488;
+    }
+    .btn-approve:hover {
+      background: #0f766e;
+    }
+    .btn-reject {
+      background: #dc2626;
+    }
+    .btn-reject:hover {
+      background: #b91c1c;
+    }
+    .btn-delete {
+      background: #6b7280;
+    }
+    .btn-delete:hover {
+      background: #4b5563;
+    }
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.5rem 1.1rem;
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .hidden-section {
+      display: none;
+    }
+    .empty-admin {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      background: white;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+    }
+    .password-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+    .change-pass {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🚚</span>
+        Truck Ada Finder.pk
+      </a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="container">
+    <div class="login-box">
+      <h2>🔐 Admin Login</h2>
+      <div class="form-group">
+        <label for="adminPass">Password</label>
+        <input type="password" id="adminPass" placeholder="Enter admin password" autocomplete="current-password">
+      </div>
+      <button class="btn" style="width:100%;" onclick="doLogin()">Login</button>
+      <p class="password-note">Default password: <strong>admin123</strong><br>You can change it after login.</p>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="adminDashboard" class="container" style="display:none;">
+    <div class="admin-header">
+      <h1 class="section-title" style="margin:0;">Admin Panel</h1>
+      <button class="btn btn-sm" style="background:#6b7280;" onclick="doLogout()">Logout</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="num" id="statPending">0</div>
+        <div class="label">Pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statApproved">0</div>
+        <div class="label">Approved</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statRejected">0</div>
+        <div class="label">Rejected</div>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-top:1.5rem;">
+      <button class="tab-btn active" data-tab="pending" onclick="switchTab('pending')">Pending</button>
+      <button class="tab-btn" data-tab="approved" onclick="switchTab('approved')">Approved</button>
+      <button class="tab-btn" data-tab="rejected" onclick="switchTab('rejected')">Rejected</button>
+      <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+    </div>
+
+    <div id="tab-pending"></div>
+    <div id="tab-approved" class="hidden-section"></div>
+    <div id="tab-rejected" class="hidden-section"></div>
+
+    <div id="tab-settings" class="hidden-section">
+      <div class="form-card">
+        <h3>Change Admin Password</h3>
+        <p class="form-desc">New password will be saved in this browser only.</p>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="newPass" placeholder="Enter new password">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="confirmPass" placeholder="Confirm new password">
+        </div>
+        <button class="btn" onclick="changePassword()">Update Password</button>
+        <div id="passMsg" style="margin-top:0.75rem; font-size:0.9rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2026 Truck Ada Finder.pk — Admin Panel</p>
+  </footer>
+
+  <script>
+    const SUB_KEY = 'truckAdaSubmissions';
+    const PASS_KEY = 'truckAda_adminPass';
+    const AUTH_KEY = 'truckAda_adminAuth';
+
+    // Default password
+    if (!localStorage.getItem(PASS_KEY)) {
+      localStorage.setItem(PASS_KEY, 'admin123');
+    }
+
+    // Check if already logged in
+    if (sessionStorage.getItem(AUTH_KEY) === 'true') {
+      showDashboard();
+    }
+
+    function doLogin() {
+      const entered = document.getElementById('adminPass').value;
+      const saved = localStorage.getItem(PASS_KEY);
+      if (entered === saved) {
+        sessionStorage.setItem(AUTH_KEY, 'true');
+        showDashboard();
+      } else {
+        alert('Wrong password. Default is: admin123');
+      }
+    }
+
+    function doLogout() {
+      sessionStorage.removeItem(AUTH_KEY);
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('adminDashboard').style.display = 'none';
+      document.getElementById('adminPass').value = '';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminDashboard').style.display = 'block';
+      renderAll();
+    }
+
+    function getSubmissions() {
+      return JSON.parse(localStorage.getItem(SUB_KEY) || '[]');
+    }
+
+    function saveSubmissions(list) {
+      localStorage.setItem(SUB_KEY, JSON.stringify(list));
+    }
+
+    function renderAll() {
+      const list = getSubmissions();
+      const pending = list.filter(s => s.status === 'pending');
+      const approved = list.filter(s => s.status === 'approved');
+      const rejected = list.filter(s => s.status === 'rejected');
+
+      document.getElementById('statPending').textContent = pending.length;
+      document.getElementById('statApproved').textContent = approved.length;
+      document.getElementById('statRejected').textContent = rejected.length;
+
+      renderList('tab-pending', pending, true);
+      renderList('tab-approved', approved, false);
+      renderList('tab-rejected', rejected, false);
+    }
+
+    function renderList(containerId, items, showActions) {
+      const box = document.getElementById(containerId);
+      if (items.length === 0) {
+        box.innerHTML = `<div class="empty-admin">No ${containerId.replace('tab-','')} submissions.</div>`;
+        return;
+      }
+
+      box.innerHTML = items.map((s, idx) => {
+        const realIndex = getSubmissions().findIndex(x =>
+          x.submittedAt === s.submittedAt && x.phone === s.phone && x.name === s.name
+        );
+        return `
+          <div class="submission-card ${s.status}">
+            <div class="sub-meta">
+              <span>📍 <strong>${s.city}</strong> (${s.province})</span>
+              <span>📅 ${new Date(s.submittedAt).toLocaleString()}</span>
+            </div>
+            <div><strong>${s.name}</strong></div>
+            <div style="margin-top:0.25rem; font-size:0.92rem;">👤 Owner: <strong>${s.owner || '—'}</strong></div>
+            <div style="margin-top:0.15rem; font-size:0.92rem;">👔 Manager: <strong>${s.manager || '—'}</strong></div>
+            <div style="margin-top:0.3rem; color:var(--text-muted); font-size:0.95rem;">${s.address}</div>
+            <div style="margin-top:0.3rem;">📞 ${s.phone}</div>
+            <div class="sub-actions">
+              ${showActions ? `
+                <button class="btn btn-sm btn-approve" onclick="setStatus(${realIndex}, 'approved')">✓ Approve</button>
+                <button class="btn btn-sm btn-reject" onclick="setStatus(${realIndex}, 'rejected')">✗ Reject</button>
+              ` : ''}
+              ${s.status === 'approved' ? `
+                <button class="btn btn-sm btn-reject" onclick="setStatus(${realIndex}, 'pending')">Move to Pending</button>
+              ` : ''}
+              ${s.status === 'rejected' ? `
+                <button class="btn btn-sm btn-approve" onclick="setStatus(${realIndex}, 'pending')">Restore to Pending</button>
+              ` : ''}
+              <button class="btn btn-sm btn-delete" onclick="deleteSub(${realIndex})">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setStatus(index, status) {
+      const list = getSubmissions();
+      if (list[index]) {
+        list[index].status = status;
+        saveSubmissions(list);
+        renderAll();
+      }
+    }
+
+    function deleteSub(index) {
+      if (!confirm('Delete this submission permanently?')) return;
+      const list = getSubmissions();
+      list.splice(index, 1);
+      saveSubmissions(list);
+      renderAll();
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+
+      ['pending', 'approved', 'rejected', 'settings'].forEach(t => {
+        document.getElementById('tab-' + t).classList.toggle('hidden-section', t !== tab);
+      });
+    }
+
+    function changePassword() {
+      const n = document.getElementById('newPass').value;
+      const c = document.getElementById('confirmPass').value;
+      const msg = document.getElementById('passMsg');
+      if (!n || n.length < 4) {
+        msg.style.color = '#dc2626';
+        msg.textContent = 'Password must be at least 4 characters.';
+        return;
+      }
+      if (n !== c) {
+        msg.style.color = '#dc2626';
+        msg.textContent = 'Passwords do not match.';
+        return;
+      }
+      localStorage.setItem(PASS_KEY, n);
+      msg.style.color = '#0d9488';
+      msg.textContent = 'Password updated successfully!';
+      document.getElementById('newPass').value = '';
+      document.getElementById('confirmPass').value = '';
+    }
+
+    // Enter key support on login
+    document.getElementById('adminPass').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+</body>
+</html>
